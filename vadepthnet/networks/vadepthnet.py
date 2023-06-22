@@ -183,7 +183,7 @@ class VarLayer(nn.Module):
         ATB = torch.bmm(AT, B)
 
         jitter = torch.eye(n=h*w, dtype=x.dtype, device=x.device).unsqueeze(0) * 1e-12
-        x, _ = torch.solve(ATB, ATA+jitter)
+        x = torch.linalg.solve(ATA+jitter, ATB)#x, _ = torch.solve(ATB, ATA+jitter)
 
         x = x.reshape(n, self.gr, h, w)
 

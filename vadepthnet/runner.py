@@ -3,9 +3,13 @@
 import torch
 import argparse
 import numpy as np
+import os
+import torch.backends.cudnn as cudnn
+import cv2
 
 from dataloaders.dataloader import NewDataLoader
 from networks.vadepthnet import VADepthNet
+from torchvision import transforms
 
 def convert_arg_line_to_args(arg_line):
     for arg in arg_line.split():
@@ -33,6 +37,10 @@ parser.add_argument('--image_path',                type=str,   help='path to the
 
 args = parser.parse_args()
 
+transform = transforms.Compose([
+    transforms.ToTensor(),
+    ])
+
 model = VADepthNet(max_depth=args.max_depth, 
                        prior_mean=args.prior_mean, 
                        img_size=(args.input_height, args.input_width))
@@ -46,7 +54,7 @@ num_params_update = sum([np.prod(p.shape) for p in model.parameters() if p.requi
 print("== Total number of learning parameters: {}".format(num_params_update))
 
 model = torch.nn.DataParallel(model)
-model.cuda()
+#model.cuda() #Turn this back on one day.
 
 print("== Model Initialized")
 
@@ -65,7 +73,7 @@ model.eval()
 
 img = load_image(args.image_path)
 img = transform(img)
-img = img.unsqueeze(0)
+img = img.unsqueeze(0).float()
 
 with torch.no_grad():  # Do not calculate gradients
         output = model(img)
