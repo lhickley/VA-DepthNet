@@ -6,6 +6,7 @@ import numpy as np
 import os
 import torch.backends.cudnn as cudnn
 import cv2
+import matplotlib.pyplot as plt
 
 from dataloaders.dataloader import NewDataLoader
 from networks.vadepthnet import VADepthNet
@@ -82,5 +83,8 @@ with torch.no_grad():  # Do not calculate gradients
 # For simplicity, let's convert it to numpy and squeeze unnecessary dimensions
 output = output.cpu().numpy().squeeze()
 
-print(output)
-
+#Return a plot of the data so we can visualise how it is doing.
+#TODO Write a function to save this image.
+plt.imshow(output, cmap='inferno')
+plt.colorbar()
+plt.show()
